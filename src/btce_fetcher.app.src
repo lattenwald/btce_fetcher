@@ -1,0 +1,19 @@
+{application, btce_fetcher,
+ [{description, "Fetches trades from BTC-e"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { btce_fetcher_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[{timeout, 2000}]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
+
+
+%% dbg:tpl(btce_fetcher, '_', []), dbg:tpl(btce_store, '_', []), dbg:p(all, c).
