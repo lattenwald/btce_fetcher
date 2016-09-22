@@ -1,3 +1,5 @@
+-define(STORAGE, btce_store).
+
 -record(transaction,
         {timestamp,
          rate,

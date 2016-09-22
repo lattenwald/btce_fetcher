@@ -7,7 +7,7 @@
    [kernel,
     stdlib
    ]},
-  {env,[{timeout, 2000}]},
+  {env,[{timeout, 2000}, {fetch_limit, 500}]},
   {modules, []},
 
   {maintainers, []},

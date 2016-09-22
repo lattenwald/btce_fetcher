@@ -6,18 +6,20 @@
 
 -include("btce_fetcher.hrl").
 
--record(state, {data}).
+-record(state, {table}).
 
 start() ->
-    gen_server:start({local, btce_store}, ?MODULE, [], []).
+    gen_server:start({local, ?STORAGE}, ?MODULE, [], []).
 
 start_link() ->
-    gen_server:start_link({local, btce_store}, ?MODULE, [], []).
+    gen_server:start_link({local, ?STORAGE}, ?MODULE, [], []).
 
 init([]) ->
-    {ok, #state{data=#{}}}.
+    {ok, Ref} = dets:open_file(?STORAGE, [{keypos, #transaction.tid}]),
+    {ok, #state{table=Ref}}.
 
-terminate(_Reason, _State) ->
+terminate(_Reason, #state{table=Table}) ->
+    dets:close(Table),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -28,9 +30,15 @@ handle_info(_Info, State) ->
 
 handle_cast({store, Item}, State) ->
     {noreply, store(State, Item)};
-%% XXX this is storage-dependent, make sure it's adequate to current storage type
-handle_cast(print, State) ->
-    io:format("state: ~p~n", [State]),
+handle_cast(info, State=#state{table=Table}) ->
+    io:format("dets:info ~p~n", [dets:info(Table)]),
+    {noreply, State};
+handle_cast(print, State=#state{table=Table}) ->
+    dets:traverse(Table,
+                  fun(Item) ->
+                          io:format("~p~n", [Item]),
+                          continue
+                  end),
     {noreply, State};
 handle_cast(_, State) ->
     {noreply, State}.
@@ -41,13 +49,6 @@ handle_call({store, Item}, _From, State) ->
 handle_call(_Request, _From, State) ->
     {reply, what, State}.
 
-%% TODO move to ets, then to mnesia
-store(Storage=#state{data=Data}, Items) ->
-    NewData = lists:foldl(fun(Item=#transaction{tid=Tid}, Acc) ->
-                                  maps:put(Tid, Item, Acc) end,
-                          Data,
-                          Items),
-    NewStorage = Storage#state{data=NewData},
-    NewStorage.
-
-%% TODO will need some way to examine storage
+store(Storage=#state{table=Table}, Items) ->
+    dets:insert(Table, Items),
+    Storage.

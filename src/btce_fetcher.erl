@@ -22,7 +22,7 @@ start_link(Timeout) ->
 init([Timeout]) ->
     inets:start(httpc, [{profile, ?PROFILE}]),
     self() ! run,
-    {ok, #state{storage=btce_store, timeout=Timeout}}.
+    {ok, #state{storage=?STORAGE, timeout=Timeout}}.
 
 terminate(_Reason, _State) ->
     ok.
