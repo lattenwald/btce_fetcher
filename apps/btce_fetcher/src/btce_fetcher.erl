@@ -4,7 +4,6 @@
 -export([handle_call/3, handle_cast/2, handle_info/2]).
 -export([start/2, start_link/2]).
 
--define(PROFILE, btce_profile).
 -define(URL, "https://btc-e.com/api/3/trades/btc_usd?limit=~B").
 
 -record(state, {url, storage, timeout}).
@@ -21,7 +20,8 @@ start_link(Timeout, FetchLimit) ->
 %%% callbacks start/stop/change
 init([Timeout, FetchLimit]) ->
     Url = io_lib:format(?URL, [FetchLimit]),
-    inets:start(httpc, [{profile, ?PROFILE}]),
+    ok = inets:start(),
+    ok = ssl:start(),
     self() ! run,
     {ok, #state{url=Url, storage=?STORAGE, timeout=Timeout}}.
 
@@ -52,7 +52,7 @@ type_to_atom(<<"bid">>) -> bid;
 type_to_atom(<<"ask">>) -> ask.
 
 fetch_data(Url) ->
-    {ok, {_Status, _Headers, Body}} = httpc:request(Url, ?PROFILE),
+    {ok, {_Status, _Headers, Body}} = httpc:request(Url),
     Data = jiffy:decode(Body, [return_maps]),
     Decoded = lists:map(
                 fun(Item) ->
