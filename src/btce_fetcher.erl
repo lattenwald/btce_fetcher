@@ -2,27 +2,28 @@
 -behaviour(gen_server).
 -export([init/1, terminate/2, code_change/3]).
 -export([handle_call/3, handle_cast/2, handle_info/2]).
--export([start/1, start_link/1]).
+-export([start/2, start_link/2]).
 
 -define(PROFILE, btce_profile).
--define(URL, "https://btc-e.com/api/3/trades/btc_usd?limit=3").
+-define(URL, "https://btc-e.com/api/3/trades/btc_usd?limit=~B").
 
--record(state, {storage, timeout}).
+-record(state, {url, storage, timeout}).
 -include("btce_fetcher.hrl").
 
 %%% API
-start(Timeout) ->
-    gen_server:start(?MODULE, [Timeout], []).
+start(Timeout, FetchLimit) ->
+    gen_server:start(?MODULE, [Timeout, FetchLimit], []).
 
-start_link(Timeout) ->
-    gen_server:start_link(?MODULE, [Timeout], []).
+start_link(Timeout, FetchLimit) ->
+    gen_server:start_link(?MODULE, [Timeout, FetchLimit], []).
 
 
 %%% callbacks start/stop/change
-init([Timeout]) ->
+init([Timeout, FetchLimit]) ->
+    Url = io_lib:format(?URL, [FetchLimit]),
     inets:start(httpc, [{profile, ?PROFILE}]),
     self() ! run,
-    {ok, #state{storage=?STORAGE, timeout=Timeout}}.
+    {ok, #state{url=Url, storage=?STORAGE, timeout=Timeout}}.
 
 terminate(_Reason, _State) ->
     ok.
@@ -38,8 +39,8 @@ handle_cast(_Cast, State) ->
     {noreply, State}.
 
 %%% callback info (used)
-handle_info(run, State=#state{timeout=Timeout, storage=Storage}) ->
-    Data = fetch_data(),
+handle_info(run, State=#state{url=Url, timeout=Timeout, storage=Storage}) ->
+    Data = fetch_data(Url),
     timer:send_after(Timeout, run),
     store_data(Data, Storage),
     {noreply, State};
@@ -50,8 +51,8 @@ handle_info(_Info, State) ->
 type_to_atom(<<"bid">>) -> bid;
 type_to_atom(<<"ask">>) -> ask.
 
-fetch_data() ->
-    {ok, {_Status, _Headers, Body}} = httpc:request(?URL, ?PROFILE),
+fetch_data(Url) ->
+    {ok, {_Status, _Headers, Body}} = httpc:request(Url, ?PROFILE),
     Data = jiffy:decode(Body, [return_maps]),
     Decoded = lists:map(
                 fun(Item) ->

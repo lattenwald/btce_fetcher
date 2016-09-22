@@ -31,6 +31,7 @@ init([]) ->
     MaxRestart = 1,
     MaxTime = 5000,
     {ok, Timeout} = application:get_env(timeout),
+    {ok, FetchLimit} = application:get_env(fetch_limit),
     %% Timeout = 2,
     {ok, { {rest_for_one, MaxRestart, MaxTime},
            [{storage,
@@ -41,7 +42,7 @@ init([]) ->
              [btce_fetcher_store]
             },
             {fetcher,
-             {btce_fetcher, start_link, [Timeout]},
+             {btce_fetcher, start_link, [Timeout, FetchLimit]},
              permanent,
              5000,
              worker,
