@@ -1,7 +1,7 @@
 btce_fetcher
 =====
 
-An OTP application, fetches trades from [https://btc-e.com](BTC-e) and stores them in [http://erlang.org/doc/man/dets.html](dets) table.
+An OTP application, fetches trades from [BTC-e](https://btc-e.com) and stores them in [dets](http://erlang.org/doc/man/dets.html) table.
 
 Build
 -----
