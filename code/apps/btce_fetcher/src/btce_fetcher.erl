@@ -20,8 +20,7 @@ start_link(Timeout, FetchLimit) ->
 %%% callbacks start/stop/change
 init([Timeout, FetchLimit]) ->
     Url = io_lib:format(?URL, [FetchLimit]),
-    ok = inets:start(),
-    ok = ssl:start(),
+    inets:start(),
     self() ! run,
     {ok, #state{url=Url, storage=?STORAGE, timeout=Timeout}}.
 

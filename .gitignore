@@ -17,5 +17,5 @@ _build
 
 *.lock
 /ttb_last_config
-/compile_commands.json
-/btce_store
+/code/compile_commands.json
+/store

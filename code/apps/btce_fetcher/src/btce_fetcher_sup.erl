@@ -32,10 +32,14 @@ init([]) ->
     MaxTime = 5000,
     {ok, Timeout} = application:get_env(timeout),
     {ok, FetchLimit} = application:get_env(fetch_limit),
-    %% Timeout = 2,
+    {ok, EnvDetsFile} = application:get_env(dets_file),
+    DetsFile = case os:getenv("BTCE_FETCHER_STORAGE") of
+                   false -> EnvDetsFile;
+                   SomeFile -> SomeFile
+               end,
     {ok, { {rest_for_one, MaxRestart, MaxTime},
            [{storage,
-             {btce_fetcher_store, start_link, []},
+             {btce_fetcher_store, start_link, [DetsFile]},
              permanent,
              5000,
              worker,

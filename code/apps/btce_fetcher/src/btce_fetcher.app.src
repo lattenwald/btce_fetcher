@@ -8,7 +8,8 @@
     stdlib
    ]},
   {env,[{timeout, 2000},
-        {fetch_limit, 500}]},
+        {fetch_limit, 500},
+        {dets_file, "btce_store.dets"}]},
   {modules, []},
 
   {maintainers, []},

@@ -2,20 +2,21 @@
 -behaviour(gen_server).
 -export([init/1, terminate/2, code_change/3]).
 -export([handle_call/3, handle_cast/2, handle_info/2]).
--export([start/0, start_link/0]).
+-export([start/1, start_link/1]).
 
 -include("btce_fetcher.hrl").
 
 -record(state, {table}).
 
-start() ->
-    gen_server:start({local, ?STORAGE}, ?MODULE, [], []).
+start(DetsFile) ->
+    gen_server:start({local, ?STORAGE}, ?MODULE, [DetsFile], []).
 
-start_link() ->
-    gen_server:start_link({local, ?STORAGE}, ?MODULE, [], []).
+start_link(DetsFile) ->
+    gen_server:start_link({local, ?STORAGE}, ?MODULE, [DetsFile], []).
 
-init([]) ->
-    {ok, Ref} = dets:open_file(?STORAGE, [{keypos, #transaction.tid}]),
+init([DetsFile]) ->
+    {ok, Ref} = dets:open_file(?STORAGE, [{keypos, #transaction.tid},
+                                          {file, DetsFile}]),
     {ok, #state{table=Ref}}.
 
 terminate(_Reason, #state{table=Table}) ->

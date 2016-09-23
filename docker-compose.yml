@@ -1,0 +1,15 @@
+version: '2'
+services:
+  runner:
+    image: lattenwald/erlang:latest
+    volumes:
+      - ./code/_build/prod/rel/btce_fetcher:/app
+      - ./store/:/store
+    environment:
+      - BTCE_FETCHER_STORAGE=/store/btce_store.dets
+    command: /app/bin/btce_fetcher
+  builder:
+    image: lattenwald/erlang:rebar3
+    volumes:
+      - ./code:/app
+    command: bash -c "rebar3 as prod release"
