@@ -47,9 +47,11 @@ handle_info(_Info, State) ->
     {noreply, State}.
 
 %%% helpers
+-spec type_to_atom(binary()) -> transaction_type().
 type_to_atom(<<"bid">>) -> bid;
 type_to_atom(<<"ask">>) -> ask.
 
+-spec fetch_data(string()) -> list(transaction()).
 fetch_data(Url) ->
     {ok, {_Status, _Headers, Body}} = httpc:request(Url),
     Data = jiffy:decode(Body, [return_maps]),

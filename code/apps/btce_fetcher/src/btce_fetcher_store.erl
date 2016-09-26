@@ -50,6 +50,7 @@ handle_call({store, Item}, _From, State) ->
 handle_call(_Request, _From, State) ->
     {reply, what, State}.
 
+-spec store(#state{}, [transaction()]) -> #state{}.
 store(Storage=#state{table=Table}, Items) ->
     dets:insert(Table, Items),
     Storage.
