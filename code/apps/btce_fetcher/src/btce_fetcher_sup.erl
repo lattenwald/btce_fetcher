@@ -28,8 +28,8 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    MaxRestart = 1,
-    MaxTime = 5000,
+    MaxRestart = 10, %% 10 restarts
+    MaxTime = 60000, %% per minute
     {ok, Timeout} = application:get_env(timeout),
     {ok, FetchLimit} = application:get_env(fetch_limit),
     {ok, EnvDetsFile} = application:get_env(dets_file),

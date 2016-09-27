@@ -1,3 +1,2 @@
--noshell
 -name btce_fetcher@127.0.0.1
 -setcookie btce_fetcher
