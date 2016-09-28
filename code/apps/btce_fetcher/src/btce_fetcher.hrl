@@ -1,5 +1,3 @@
--define(STORAGE, btce_store).
-
 -type transaction_type() :: 'bid' | 'ask'.
 
 -record(transaction,

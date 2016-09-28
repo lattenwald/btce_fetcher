@@ -7,7 +7,7 @@
 -define(URL, "https://btc-e.com/api/3/trades/btc_usd?limit=~B").
 -define(RETRY_TIME, 10000).
 
--record(state, {url, storage, timeout}).
+-record(state, {url, timeout}).
 -include("btce_fetcher.hrl").
 
 %%% API
@@ -23,7 +23,7 @@ init([Timeout, FetchLimit]) ->
     Url = io_lib:format(?URL, [FetchLimit]),
     inets:start(),
     self() ! run,
-    {ok, #state{url=Url, storage=?STORAGE, timeout=Timeout}}.
+    {ok, #state{url=Url, timeout=Timeout}}.
 
 terminate(_Reason, _State) ->
     ok.
@@ -39,10 +39,10 @@ handle_cast(_Cast, State) ->
     {noreply, State}.
 
 %%% callback info (used)
-handle_info(run, State=#state{url=Url, timeout=Timeout, storage=Storage}) ->
+handle_info(run, State=#state{url=Url, timeout=Timeout}) ->
     Data = fetch_data(Url),
-    timer:send_after(Timeout, run),
-    store_data(Data, Storage),
+    {ok, _TRef} = timer:send_after(Timeout, run),
+    store_data(Data),
     {noreply, State};
 handle_info(_Info, State) ->
     {noreply, State}.
@@ -71,6 +71,6 @@ fetch_data(Url) ->
                 end, maps:get(<<"btc_usd">>, Data)),
     Decoded.
 
-store_data(Data, Storage) ->
-    gen_server:call(Storage, {store, Data}),
+store_data(Data) ->
+    btce_fetcher_store:store_data(Data),
     ok.
