@@ -12,3 +12,14 @@ Run
 -----
 
     $ docker-compose up runner
+
+Shell
+-----
+
+To connect to running app, do
+
+    $ ./shell
+
+**DO NOT** `q().` in that shell, doing it will stop application.
+
+Do `init:stop().` or `^G q` instead.
