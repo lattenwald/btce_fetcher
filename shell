@@ -2,4 +2,4 @@
 NAME=$(grep -Po '(?<=-name ).*$' code/config/vm.args)
 HOST=$(echo $NAME | sed 's/^.*@//')
 COOKIE=$(grep -Po '(?<=-setcookie ).*$' code/config/vm.args)
-docker-compose exec runner erl -setcookie $COOKIE -name shell@$HOST -remsh $NAME -hidden
+docker-compose exec runner sh -c "TERM=xterm erl -setcookie $COOKIE -name shell@$HOST -remsh $NAME -hidden"
