@@ -60,7 +60,13 @@ fetch_data(Url) ->
                    timer:sleep(?RETRY_TIME),
                    error(connect_failed, Args)
            end,
-    Data = jiffy:decode(Body, [return_maps]),
+    Data = try jiffy:decode(Body, [return_maps]) of
+               Stuff -> Stuff
+           catch
+               {error, {ErrId, invalid_json}} ->
+                   timer:sleep(?RETRY_TIME),
+                   throw({error, {ErrId, invalid_json}})
+           end,
     Decoded = lists:map(
                 fun(Item) ->
                         #transaction{timestamp=maps:get(<<"timestamp">>, Item),
