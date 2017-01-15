@@ -5,7 +5,8 @@
   {mod, { btce_fetcher_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    runtime_tools
    ]},
   {env,[{timeout, 2000},
         {fetch_limit, 500},
