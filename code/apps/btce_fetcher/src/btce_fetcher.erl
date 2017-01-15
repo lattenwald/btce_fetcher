@@ -58,7 +58,10 @@ fetch_data(Url) ->
                {ok, {_Status, _Headers, Body1}} -> Body1;
                {connect_failed, Args} ->
                    timer:sleep(?RETRY_TIME),
-                   error(connect_failed, Args)
+                   error(connect_failed, Args);
+               {error, socket_closed_remotely = Err} ->
+                   timer:sleep(?RETRY_TIME),
+                   error(Err)
            end,
     Data = try jiffy:decode(Body, [return_maps]) of
                Stuff -> Stuff
